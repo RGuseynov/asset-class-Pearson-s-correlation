@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Asset class Correlation</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js"></script> <!-- Copyright (c) 2018 Chart.js Contributors -->
+    <script src="JScode.js"></script>
+</head>
+
+<body>
+
+<div  style="position: absolute; left: 850px; top: 350px; display: inline-block">
+  <h2>Market Pearson's Correlation</h2>
+
+  <form>
+  <p>Market 1:<select id="marketSelector1"></p>
+  <option>BTC
+  <option>SP500
+  <option>NASDAQ100
+  <option>GOLD
+  <option>SILVER
+  </select>
+  </form>
+
+  <form>
+  <p>Market 2:<select id="marketSelector2"></p>
+  <option>BTC
+  <option>SP500
+  <option>NASDAQ100
+  <option>GOLD
+  <option>SILVER
+  </select>
+  </form>
+
+  <p>Values since: <input type="date" id="dateSelector"></p>
+
+  <p style=>Interval of day to take for daily Pearson's correlation calculation <input type="text" id="pearsonSelector"></p>
+
+  <button id="validation">Submit</button>
+</div>
+
+  <div id="forCanvas1" style="width:800px; height:380px;"></div>
+  <div id="forCanvas2" style="width:800px; height:380px;"></div>
+  <div id="forCanvas3" style="width:800px; height:380px;"></div>
+
+  <SCRIPT>
+
+
+  var markets = []; // array that will contains string names of markets in index i and their data in index + 1, it will be filled by api calls
+
+
+  $("#validation").click(function(){ // all the code below will be executed when validation button is clicked
+
+    // assigning user inputs into variables
+    var market1 = $("#marketSelector1").val();
+    var market2 = $("#marketSelector2").val();
+    var dateSelected = $("#dateSelector").val();
+    var pearsonSelected = $("#pearsonSelector").val();
+
+
+    // selecting data corresponding to market 1 and 2 user input
+    var index1 = markets.indexOf(market1) + 1;
+    var data1 = markets[index1];
+    var index2 = markets.indexOf(market2) + 1;
+    var data2 = markets[index2];
+
+
+    // selecting corresponding period of time to analyse and display
+    dateFrom(data1.date, data1.price, dateSelected);
+    dateFrom(data2.date, data2.price, dateSelected);
+
+    setSameDates(data1.date, data1.price, data2.date, data2.price); // setting up arrays to have same length and same correspondance of prices
+
+
+    var arrayPearson = variablePearson(data1.price, data2.price, pearsonSelected); // setting up array of Pearson's correlation
+
+
+    // setting up div, canvas and charts with Chart.js
+    $("#forCanvas1").empty(); // cleaning div element before inserting new canvas
+    var canvas1 = "<canvas id='myChart1'></canvas>";
+    $("#forCanvas1").append(canvas1); // adding a canvas element in the div element
+
+    var ctx1 = $("#myChart1"); // chart drawing
+    var myChart = new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels : data1.date,
+            datasets: [{
+              pointRadius: 0,
+              label: market1,
+              data: data1.price
+            }]
+          },
+          options: {
+          }
+    });
+
+
+    // same as above for market 2
+    $("#forCanvas2").empty();
+    var canvas2 = "<canvas id='myChart2'></canvas>";
+    $("#forCanvas2").append(canvas2);
+
+    var ctx2 = $("#myChart2");
+    var myChart2 = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels : data2.date,
+            datasets: [{
+                pointRadius: 0,
+                label: market2,
+                data: data2.price
+            }]
+        },
+        options: {
+        }
+    });
+
+
+    // same as above for Pearson's correlation
+    $("#forCanvas3").empty();
+    var canvas3 = "<canvas id='myChart3'></canvas>";
+    $("#forCanvas3").append(canvas3);
+
+    var ctx3 = $("#myChart3");
+    var myChart = new Chart(ctx3, {
+        type: 'line',
+        data: {
+            labels : data1.date,
+            datasets: [{
+              pointRadius: 0,
+              label: "Pearson's correlation",
+              data: arrayPearson
+            }]
+          },
+          options: {
+          }
+    });
+
+
+  });
+
+  </SCRIPT>
+
+</body>
+
+</html>
