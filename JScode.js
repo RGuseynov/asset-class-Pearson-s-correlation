@@ -119,7 +119,7 @@ function quandlDataSetUp(data){ // extracting dates ans corresponding prices fro
 function dateFrom(dateArray, priceArray, date){ // modify an array of dates and an array of corresponding prices to keep only dates and prices from the specified date
   var index = 0;
   var lastIndex = dateArray.length - 1;
-  if (date > dateArray[index] || date < dateArray[lastIndex]){ // check if the specified date is in the range of dates of the array, if not no change will be made to the array
+  if (date > dateArray[index] && date < dateArray[lastIndex]){ // check if the specified date is in the range of dates of the array, if not no change will be made to the array
     while (date > dateArray[index]){ // counting the index from where the function will keep remaining dates
         index++;
     }
@@ -137,23 +137,19 @@ function setSameDates(dates1, prices1, dates2, prices2){
     if(dates1[i] == dates2[i]){ // no change if both dates are equal in both arrays
       i++;
     }
-    else if(dates1 < dates2){ // if one date is smaller, we delete it and the prices associated with
+    else if(dates1 < dates2 && i != dates1.length){ // if one date is smaller and if we are not at the end of the array, we delete it and the prices associated with
       dates1.splice(i,1);
       prices1.splice(i,1);
     }
-    else if(dates1 > dates2){ // same as above
+    else if(dates1 > dates2 && i != dates2.length){ // same as above
       dates2.splice(i,1);
       prices2.splice(i,1);
     }
-    else if(i <= dates1.length){ // we reach here if one array are no more values and the other still have some
-      var remain = dates1.length - i; // count of number of remaining date in the array
-      dates1.splice(i,remain); // deleting the remaining dates from the array
-      prices1.splice(i,remain);
-    }
-    else{                      // same as above for other date array
-      var remain2 = dates2.length - i;
-      date2.splice(i,remain2);
-      prices2.splice(i,remain2);
+    else{ // we reach here if one array are no more values and the other still have some, deleting remaining values
+      dates1.splice(i,1);
+      prices1.splice(i,1);
+      dates2.splice(i,1);
+      prices2.splice(i,1);
     }
   }
 }
