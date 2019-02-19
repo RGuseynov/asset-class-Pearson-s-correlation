@@ -2,49 +2,55 @@
 <html lang="en-US">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Asset classes Correlation</title>
+  <meta charset="UTF-8">
+  <title>Asset classes Correlation</title>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js"></script> <!-- Copyright (c) 2018 Chart.js Contributors -->
-    <script src="JScode.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js"></script> <!-- Copyright (c) 2018 Chart.js Contributors -->
+  <script src="JScode.js"></script>
 </head>
+
 
 <body>
 
-<div  style="position: absolute; left: 850px; top: 350px; display: inline-block">
-  <h2>Asset classes Pearson's Correlation</h2>
+  <div  style="position: absolute; left: 850px; top: 350px; display: inline-block">
 
-  <form>
-  <p>Market 1:<select id="marketSelector1"></p>
-  <option>BTC
-  <option>SP500
-  <option>NASDAQ100
-  <option>GOLD
-  <option>SILVER
-  </select>
-  </form>
+    <h2>Asset classes Pearson's Correlation</h2>
 
-  <form>
-  <p>Market 2:<select id="marketSelector2"></p>
-  <option>BTC
-  <option>SP500
-  <option>NASDAQ100
-  <option>GOLD
-  <option>SILVER
-  </select>
-  </form>
+    <form>
+      <p>Market 1:<select id="marketSelector1"></p>
+        <option>BTC
+        <option>SP500
+        <option>NASDAQ100
+        <option>GOLD
+        <option>SILVER
+      </select>
+    </form>
 
-  <p>Values since: <input type="date" id="dateSelector"></p>
+    <form>
+      <p>Market 2:<select id="marketSelector2"></p>
+        <option>BTC
+        <option>SP500
+        <option>NASDAQ100
+        <option>GOLD
+        <option>SILVER
+      </select>
+    </form>
 
-  <p style=>Interval of day to take for daily Pearson's correlation calculation <input type="text" id="pearsonSelector"></p>
+    <p>Values since: <input type="date" id="dateSelector"></p>
 
-  <button id="validation">Submit</button>
-</div>
+    <p style=>Interval of open market day to take for correlation variation calculation <input type="text" id="pearsonSelector"></p>
+
+    <button id="validation">Submit</button>
+
+  </div>
+
+  <p id="forCorrelation" style="position: absolute; left: 850px; top: 900px"></p>
 
   <div id="forCanvas1" style="width:800px; height:380px;"></div>
   <div id="forCanvas2" style="width:800px; height:380px;"></div>
   <div id="forCanvas3" style="width:800px; height:380px;"></div>
+
 
   <SCRIPT>
 
@@ -54,6 +60,7 @@
 
   $("#validation").click(function(){ // all the code below will be executed when validation button is clicked
 
+
     // assigning user inputs into variables
     var market1 = $("#marketSelector1").val();
     var market2 = $("#marketSelector2").val();
@@ -61,87 +68,105 @@
     var pearsonSelected = $("#pearsonSelector").val();
 
 
-    // selecting data corresponding to market 1 and 2 user input
-    var index1 = markets.indexOf(market1) + 1;
-    var data1 = markets[index1];
-    var index2 = markets.indexOf(market2) + 1;
-    var data2 = markets[index2];
+    if(pearsonSelected > 300){ // greater than 300 will greatly slow calculations, we want avoid that
+      alert("Maximum interval of day for variable correlation is 300"); // the code below will not be executed and nothing displayed on screen
+    }
+    else{
 
 
-    // selecting corresponding period of time to analyse and display
-    dateFrom(data1.date, data1.price, dateSelected);
-    dateFrom(data2.date, data2.price, dateSelected);
-
-    setSameDates(data1.date, data1.price, data2.date, data2.price); // setting up arrays to have same length and same correspondance of prices
-
-
-    var arrayPearson = variablePearson(data1.price, data2.price, pearsonSelected); // setting up array of Pearson's correlation
+      // selecting data corresponding to market 1 and 2 user input
+      var index1 = markets.indexOf(market1) + 1;
+      var data1 = markets[index1];
+      var index2 = markets.indexOf(market2) + 1;
+      var data2 = markets[index2];
 
 
-    // setting up div, canvas and charts with Chart.js
-    $("#forCanvas1").empty(); // cleaning div element before inserting new canvas
-    var canvas1 = "<canvas id='myChart1'></canvas>";
-    $("#forCanvas1").append(canvas1); // adding a canvas element in the div element
-
-    var ctx1 = $("#myChart1"); // chart drawing
-    var myChart = new Chart(ctx1, {
-        type: 'line',
-        data: {
-            labels : data1.date,
-            datasets: [{
-              pointRadius: 0,
-              label: market1,
-              data: data1.price
-            }]
-          },
-          options: {
-          }
-    });
+      // selecting corresponding period of time to analyse and display
+      dateFrom(data1.date, data1.price, dateSelected);
+      dateFrom(data2.date, data2.price, dateSelected);
 
 
-    // same as above for market 2
-    $("#forCanvas2").empty();
-    var canvas2 = "<canvas id='myChart2'></canvas>";
-    $("#forCanvas2").append(canvas2);
+      setSameDates(data1.date, data1.price, data2.date, data2.price); // setting up arrays to have same length and same correspondance of prices
 
-    var ctx2 = $("#myChart2");
-    var myChart2 = new Chart(ctx2, {
-        type: 'line',
-        data: {
-            labels : data2.date,
-            datasets: [{
+
+      var overallCorrelation = correlation_Pearson(data1.price, data2.price); // correlation of the entire arrays
+      var arrayPearson = variablePearson(data1.price, data2.price, pearsonSelected); // setting up array of Pearson's correlation
+
+
+      // setting up div, canvas and charts with Chart.js
+      $("#forCanvas1").empty(); // cleaning div element before inserting new canvas
+      var canvas1 = "<canvas id='myChart1'></canvas>";
+      $("#forCanvas1").append(canvas1); // adding a canvas element in the div element
+
+      var ctx1 = $("#myChart1"); // chart drawing
+      var myChart = new Chart(ctx1, {
+          type: 'line',
+          data: {
+              labels : data1.date,
+              datasets: [{
                 pointRadius: 0,
-                label: market2,
-                data: data2.price
-            }]
-        },
-        options: {
-        }
-    });
-
-
-    // same as above for Pearson's correlation
-    $("#forCanvas3").empty();
-    var canvas3 = "<canvas id='myChart3'></canvas>";
-    $("#forCanvas3").append(canvas3);
-
-    var ctx3 = $("#myChart3");
-    var myChart = new Chart(ctx3, {
-        type: 'line',
-        data: {
-            labels : data1.date,
-            datasets: [{
-              pointRadius: 0,
-              label: "Pearson's correlation",
-              data: arrayPearson
-            }]
+                label: market1,
+                data: data1.price
+              }]
           },
           options: {
           }
-    });
+      });
+
+
+      // same as above for market 2
+      $("#forCanvas2").empty();
+      var canvas2 = "<canvas id='myChart2'></canvas>";
+      $("#forCanvas2").append(canvas2);
+
+      var ctx2 = $("#myChart2");
+      var myChart2 = new Chart(ctx2, {
+          type: 'line',
+          data: {
+              labels : data2.date,
+              datasets: [{
+                  pointRadius: 0,
+                  label: market2,
+                  data: data2.price
+              }]
+          },
+          options: {
+          }
+      });
+
+
+      // same as above for Pearson's correlation
+      $("#forCanvas3").empty();
+      var canvas3 = "<canvas id='myChart3'></canvas>";
+      $("#forCanvas3").append(canvas3);
+
+      var ctx3 = $("#myChart3");
+      var myChart = new Chart(ctx3, {
+          type: 'line',
+          data: {
+              labels : data1.date,
+              datasets: [{
+                pointRadius: 0,
+                label: "Correlation variation",
+                data: arrayPearson
+              }]
+          },
+          options: {
+          }
+      });
+
+
+      $("#forCorrelation").empty();
+      var p = "Overral Correlation: ";
+      $("#forCorrelation").append(p);
+      $("#forCorrelation").append(overallCorrelation);
+
+
+    }
 
 
   });
+
 
   </SCRIPT>
 
