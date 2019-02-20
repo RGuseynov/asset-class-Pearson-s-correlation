@@ -174,7 +174,7 @@ function covariance (x, y){ // formula of covariance is ∑((x(i)-x(avg))((y(i)-
   for(let i = 0; i < x.length; i++){ // loop to calculate the sum of multiplications
     somme_produit = somme_produit + ((x[i] - average(x)) * (y[i] - average(y)));
   }
-  return somme_produit / (x.length); // we divide by the number of couples and return the result
+  return somme_produit / (x.length); // dividing by the number of couples and return the result
 }
 
 
@@ -183,7 +183,7 @@ function standard_deviation (x){ // formula of standard deviation is square root
  for(let i = 0; i < x.length; i++){
    somme_operation = somme_operation + Math.pow(Math.abs(x[i] - average(x)), 2);
  }
- return Math.sqrt(somme_operation / x.length); // we divide by the number of values of x and we return the quare root of the result
+ return Math.sqrt(somme_operation / x.length); // dividing by the number of values of x and we return the quare root of the result
 }
 
 
@@ -199,17 +199,17 @@ function variablePearson(prices1, prices2, interval){
   var prices1Interval = []; // array on values in the interval from prices1
   var prices2Intreval = []; // same for prices2
 
-/* to calculate correlation, we take values from price-interval/2 and price+interval/2 from current price,
+/* the range of value to calculate correlation is from current price-interval/2 to current price+interval/2
 the first loop is to avoid to go "outside" array by the front,
 the second loop is the main loop,
 the third is to avoid to go "outside" array by the end
-note : in loop 1 and 3, we take from interval/2 to interval-1 values to calculate Pearson's correlation*/
-  for(i = 0; i < interval; i++){
+note : in loop 1 and 3, the range of values to calculate Pearson's correlation vary from interval/2 to interval-1 */
+  for(i = 0; i < interval / 2; i++){
     prices1Interval = prices1.slice(0, i + interval / 2);
     prices2Interval = prices2.slice(0, i + interval / 2);
     correlationPearson.push(correlation_Pearson(prices1Interval,prices2Interval)); // calculation of correlation of values in the interval and put the result on the array of correlation
   }
-  for(i = interval; i < prices1.length - interval / 2; i++){
+  for(i = interval / 2; i < prices1.length - interval / 2; i++){
     prices1Interval = prices1.slice(i - interval / 2, i + interval / 2);
     prices2Interval = prices2.slice(i - interval / 2, i + interval / 2);
     correlationPearson.push(correlation_Pearson(prices1Interval,prices2Interval));

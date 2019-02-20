@@ -37,9 +37,9 @@
       </select>
     </form>
 
-    <p>Values since: <input type="date" id="dateSelector"></p>
+    <p>Values since: <input type="date" value="2011-06-01" id="dateSelector">(Data avaible from 2011-06-11 to 2019-02-15)</p>
 
-    <p style=>Interval of open market day to take for correlation variation calculation <input type="text" id="pearsonSelector"></p>
+    <p style=>Interval of open market day to take for correlation variation calculation <input type="text" placeholder="50" id="pearsonSelector"></p>
 
     <button id="validation">Submit</button>
 
@@ -66,6 +66,11 @@
     var market2 = $("#marketSelector2").val();
     var dateSelected = $("#dateSelector").val();
     var pearsonSelected = $("#pearsonSelector").val();
+
+
+    if (pearsonSelected == ""){ // setting default value to 50 if no input
+    pearsonSelected = 50;
+    }
 
 
     if(pearsonSelected > 300){ // greater than 300 will greatly slow calculations, we want avoid that
